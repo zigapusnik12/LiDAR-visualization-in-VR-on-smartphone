@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Samples/hellocardboard-unity/Scenes/HelloCardboard-Full.unity
+    path: Assets/Scenes/LiDAR VR.unity
     guid: dee7b7bee63ec95468620aab2f0fdf01
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 55870022423f14a43abc1bfed6c15f52, type: 2}

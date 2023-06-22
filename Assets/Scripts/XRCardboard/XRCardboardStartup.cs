@@ -24,6 +24,7 @@ using UnityEngine;
 /// </summary>
 public class XRCardboardStartup : MonoBehaviour
 {
+#if (!UNITY_EDITOR)
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -69,4 +70,5 @@ public class XRCardboardStartup : MonoBehaviour
 
         Api.UpdateScreenParams();
     }
+#endif
 }
