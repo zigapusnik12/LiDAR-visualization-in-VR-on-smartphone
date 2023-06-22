@@ -6,6 +6,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SpatialTracking;
+using UnityEngine.UI;
 
 public class XRCardboardController : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class XRCardboardController : MonoBehaviour
     GameObject vrGroup = default;
     [SerializeField]
     GameObject standardGroup = default;
+    [SerializeField]
+    Button closeBtn = default;
     [SerializeField]
     XRCardboardInputModule vrInputModule = default;
     [SerializeField]
@@ -28,10 +31,10 @@ public class XRCardboardController : MonoBehaviour
     Quaternion attitude;
     Vector2 dragDegrees;
     float defaultFov;
+    public static bool vrActive;
 
 #if UNITY_EDITOR
     Vector3 lastMousePos;
-    bool vrActive;
 #endif
 
     void Awake()
@@ -47,7 +50,8 @@ public class XRCardboardController : MonoBehaviour
 #if UNITY_EDITOR
         SetObjects(vrActive);
 #else
-        SetObjects(UnityEngine.XR.XRSettings.enabled);
+        vrActive = UnityEngine.XR.XRSettings.enabled;
+        SetObjects(vrActive);
 #endif
     }
 
@@ -55,10 +59,16 @@ public class XRCardboardController : MonoBehaviour
     {
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (!vrActive)
+                StopApplication();
+            else
 #else
         if (Api.IsCloseButtonPressed)
+        {
 #endif
-            DisableVR();
+                DisableVR();
+        }
 
 #if UNITY_EDITOR
         if (vrActive)
@@ -66,7 +76,8 @@ public class XRCardboardController : MonoBehaviour
         else
             SimulateDrag();
 #else
-        if (UnityEngine.XR.XRSettings.enabled)
+        vrActive = UnityEngine.XR.XRSettings.enabled;
+        if (vrActive)
             return;
 
         CheckDrag();
@@ -128,11 +139,36 @@ public class XRCardboardController : MonoBehaviour
 
     void SetObjects(bool vrActive)
     {
+        if (!standardGroup.activeSelf)
+            DisableCloseBtnCoroutine();
         standardGroup.SetActive(!vrActive);
         vrGroup.SetActive(vrActive);
         standardInputModule.enabled = !vrActive;
         vrInputModule.enabled = vrActive;
         poseDriver.enabled = vrActive;
+    }
+
+    private Coroutine DisableCloseBtnCoroutine()
+    {
+        return StartCoroutine(disableCloseBtnRoutine(0.1f));
+
+        IEnumerator disableCloseBtnRoutine(float duration)
+        {
+            closeBtn.interactable = false;
+            yield return new WaitForSeconds(duration);
+            closeBtn.interactable = true;
+        }
+    }
+
+    public void CloseApp() => StopApplication();
+
+    private void StopApplication()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     void CheckDrag()
