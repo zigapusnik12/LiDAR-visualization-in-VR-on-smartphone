@@ -15,6 +15,8 @@ public class XRCardboardController : MonoBehaviour
     [SerializeField]
     GameObject vrGroup = default;
     [SerializeField]
+    GameObject teleportGroup = default;
+    [SerializeField]
     GameObject standardGroup = default;
     [SerializeField]
     Button closeBtn = default;
@@ -146,6 +148,8 @@ public class XRCardboardController : MonoBehaviour
         standardInputModule.enabled = !vrActive;
         vrInputModule.enabled = vrActive;
         poseDriver.enabled = vrActive;
+
+        teleportGroup.SetActive(vrActive && PlayerMovement.isGazing);
     }
 
     private Coroutine DisableCloseBtnCoroutine()
