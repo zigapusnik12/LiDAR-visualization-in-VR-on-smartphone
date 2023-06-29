@@ -19,6 +19,10 @@ public class XRCardboardController : MonoBehaviour
     [SerializeField]
     GameObject standardGroup = default;
     [SerializeField]
+    GameObject settingsGroup = default;
+    [SerializeField]
+    Material pointMaterial = default;
+    [SerializeField]
     Button closeBtn = default;
     [SerializeField]
     XRCardboardInputModule vrInputModule = default;
@@ -34,6 +38,10 @@ public class XRCardboardController : MonoBehaviour
     Vector2 dragDegrees;
     float defaultFov;
     public static bool vrActive;
+    public static bool settingsOpened;
+    public static bool isPointerOverSettings;
+    public static bool LASColorActive;
+    public static bool teleportActive;
 
 #if UNITY_EDITOR
     Vector3 lastMousePos;
@@ -49,8 +57,12 @@ public class XRCardboardController : MonoBehaviour
 
     void Start()
     {
+        settingsOpened = false;
+        isPointerOverSettings = false;
+        LASColorActive = true;
+        teleportActive = false;
 #if UNITY_EDITOR
-        SetObjects(vrActive);
+    SetObjects(vrActive);
 #else
         vrActive = UnityEngine.XR.XRSettings.enabled;
         SetObjects(vrActive);
@@ -72,21 +84,24 @@ public class XRCardboardController : MonoBehaviour
                 DisableVR();
         }
 
+        if (!(settingsOpened && isPointerOverSettings))
+        {
 #if UNITY_EDITOR
-        if (vrActive)
-            SimulateVR();
-        else
-            SimulateDrag();
+            if (vrActive)
+                SimulateVR();
+            else
+                SimulateDrag();
 #else
-        vrActive = UnityEngine.XR.XRSettings.enabled;
-        if (vrActive)
-            return;
+            vrActive = UnityEngine.XR.XRSettings.enabled;
+            if (vrActive)
+                return;
 
-        CheckDrag();
+            CheckDrag();
 #endif
 
-        attitude = initialRotation * Quaternion.Euler(dragDegrees.x, 0, 0);
-        cameraTransform.rotation = Quaternion.Euler(0, -dragDegrees.y, 0) * attitude;
+            attitude = initialRotation * Quaternion.Euler(dragDegrees.x, 0, 0);
+            cameraTransform.rotation = Quaternion.Euler(0, -dragDegrees.y, 0) * attitude;
+        }
     }
 
     public void ResetCamera()
@@ -97,6 +112,7 @@ public class XRCardboardController : MonoBehaviour
 
     public void DisableVR()
     {
+        initialRotation = cameraTransform.rotation;
 #if UNITY_EDITOR
         vrActive = false;
 #else
@@ -135,6 +151,7 @@ public class XRCardboardController : MonoBehaviour
             xrManager.StartSubsystems();
 #endif
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            initialRotation = cameraTransform.rotation;
             ResetCamera();
         }
     }
@@ -149,7 +166,9 @@ public class XRCardboardController : MonoBehaviour
         vrInputModule.enabled = vrActive;
         poseDriver.enabled = vrActive;
 
-        teleportGroup.SetActive(vrActive && PlayerMovement.isGazing);
+        settingsOpened = false;
+        settingsGroup.SetActive(settingsOpened);
+        teleportGroup.SetActive(vrActive && teleportActive);
     }
 
     private Coroutine DisableCloseBtnCoroutine()
@@ -173,6 +192,39 @@ public class XRCardboardController : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    public void ToggleSettingsPanel() => ToggleSettings();
+    private void ToggleSettings()
+    {
+        settingsOpened = !settingsOpened;
+        settingsGroup.SetActive(settingsOpened);
+    }
+
+    public void ToggleTouchToMove() => ToggleTeleport();
+    private void ToggleTeleport()
+    {
+        teleportActive = !teleportActive;
+    }
+
+    public void ToggleLASColor() => ToggleShaderKeyword();
+    private void ToggleShaderKeyword()
+    {
+        LASColorActive = !LASColorActive;
+        if (LASColorActive)
+            pointMaterial.EnableKeyword("_LAS_ON");
+        else
+            pointMaterial.DisableKeyword("_LAS_ON");
+    }
+
+    public void onPointerOverSettingsEnter()
+    {
+        isPointerOverSettings = true;
+    }
+
+    public void onPointerOverSettingsExit()
+    {
+        isPointerOverSettings = false;
     }
 
     void CheckDrag()

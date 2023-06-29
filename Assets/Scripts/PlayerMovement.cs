@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,21 +10,18 @@ public class PlayerMovement : MonoBehaviour
     Button move;
 
     [SerializeField]
-    int playerSpeed;
-
-    [SerializeField]
     bool isActive;
-
-    public static bool isGazing;
 
     [SerializeField]
     GameObject teleportGroup = default;
+
+    public static float playerSpeed;
 
     // Start is called before the first frame update
     void Start()
     {
         isActive = false;
-        isGazing = false;
+        playerSpeed = 100;
     }
 
     // Update is called once per frame
@@ -31,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (XRCardboardController.vrActive)
         {
-            if (!isGazing && Input.GetButton("Fire1"))
+            if (!XRCardboardController.teleportActive && Input.GetButton("Fire1"))
             {
                 transform.position = transform.position + Camera.main.transform.forward * playerSpeed * Time.deltaTime;
             }
@@ -45,6 +43,12 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
+
+    public void OnPlayerSpeedSliderValueChanged(float value)
+    {
+        playerSpeed = value;
+    }
+
     public void onPress()
     {
         isActive = true;
@@ -53,11 +57,6 @@ public class PlayerMovement : MonoBehaviour
     public void onRelease()
     {
         isActive = false;
-    }
-
-    public void EnableGazing()
-    {
-        isGazing = true;
     }
 
     public void RefreshTeleport() => RefreshTeleportCoroutine();

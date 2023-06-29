@@ -56,8 +56,9 @@ public class ObjectController : MonoBehaviour
     public void Teleport()
     {
         // Moves the player to the new position.
-        if (PlayerMovement.isGazing)
-            Player.transform.position = transform.position;
+        if (XRCardboardController.teleportActive)
+            Debug.Log(transform.localPosition.normalized * PlayerMovement.playerSpeed);
+            Player.transform.position = transform.TransformPoint(transform.localPosition.normalized * (PlayerMovement.playerSpeed / 10));
         SetMaterial(false);
     }
 
