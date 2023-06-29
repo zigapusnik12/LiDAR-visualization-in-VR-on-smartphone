@@ -123,12 +123,13 @@ public class XRCardboardController : MonoBehaviour
             xrManager.DeinitializeLoader();
         }
 #endif
-        SetObjects(false);
-        ResetCamera();
         cam.ResetAspect();
         cam.fieldOfView = defaultFov;
         cam.ResetProjectionMatrix();
         cam.ResetWorldToCameraMatrix();
+        SetObjects(false);
+        ResetCamera();
+        RecenterCamera();
         Screen.sleepTimeout = SleepTimeout.SystemSetting;
     }
 
@@ -150,9 +151,24 @@ public class XRCardboardController : MonoBehaviour
                 yield return xrManager.InitializeLoader();
             xrManager.StartSubsystems();
 #endif
-            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            RecenterCamera();
             initialRotation = cameraTransform.rotation;
             ResetCamera();
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        }
+    }
+
+    void RecenterCamera()
+    {
+        if (vrActive)
+        {
+            cameraTransform.parent.localEulerAngles = cameraTransform.localEulerAngles;
+            cameraTransform.localEulerAngles = Vector3.zero;
+        }
+        else
+        {
+            cameraTransform.localEulerAngles = cameraTransform.parent.localEulerAngles + cameraTransform.localEulerAngles;
+            cameraTransform.parent.localEulerAngles = Vector3.zero;
         }
     }
 
