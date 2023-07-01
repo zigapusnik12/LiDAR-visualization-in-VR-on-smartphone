@@ -57,7 +57,6 @@ public class ObjectController : MonoBehaviour
     {
         // Moves the player to the new position.
         if (XRCardboardController.teleportActive)
-            Debug.Log(transform.localPosition.normalized * PlayerMovement.playerSpeed);
             Player.transform.position = transform.TransformPoint(transform.localPosition.normalized * (PlayerMovement.playerSpeed / 10));
         SetMaterial(false);
     }
