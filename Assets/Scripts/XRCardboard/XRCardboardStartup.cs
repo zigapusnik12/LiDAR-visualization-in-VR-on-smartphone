@@ -60,7 +60,7 @@ public class XRCardboardStartup : MonoBehaviour
 
         if (Api.IsTriggerHeldPressed)
         {
-            Api.Recenter();
+            //Api.Recenter();
         }
 
         if (Api.HasNewDeviceParams())
