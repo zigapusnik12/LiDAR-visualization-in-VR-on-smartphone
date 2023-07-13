@@ -57,6 +57,7 @@ public class XRCardboardController : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 60;
         settingsOpened = false;
         isPointerOverSettings = false;
         LASColorActive = true;
