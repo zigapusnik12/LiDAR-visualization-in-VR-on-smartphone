@@ -12,7 +12,9 @@ The application enables movement in virtual space and, when visualizing points w
     - translate, rotate and scale LiDAR point cloud if need be (Unity uses different axis, coordinates shouldn't be too big)
     - save it to binary .ply
     - aplication only support reading XYZ coordinates and RGB values (for better understaning look at provided image with ASCII .ply)
+
 ![Screenshot](PLY_ASC.png)
+
 - import .ply to Unity project
 - click on it and select "Container Type" to "Mesh" (already installed PCX package from [Keijiro](https://github.com/keijiro/Pcx))
 - drag imported file into the scene "LiDAR VR" (if you don't see point cloud, double click the object in hierarchy)
